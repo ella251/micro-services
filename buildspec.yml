@@ -1,19 +1,26 @@
 version: 0.2
 
+env:
+  variables:
+    AWS_DEFAULT_REGION: "us-east-1"
+    ECR_REPO_URI: "852856666844.dkr.ecr.us-east-1.amazonaws.com/analytics-app"
+    IMAGE_TAG: "latest"
+
 phases:
   pre_build:
     commands:
-      - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION |
-        docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
-
+      - echo "Logging in to Amazon ECR..."
+      - aws --version
+      - docker --version
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin 852856666844.dkr.ecr.us-east-1.amazonaws.com
   build:
     commands:
-      - echo Build started
-      - docker build -t analytics-app .
-      - docker tag analytics-app:latest $ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/analytics-app:latest
-
+      - echo "Building the Docker image..."
+      - docker build -t analytics-app:$IMAGE_TAG .
+      - echo "Tagging the image..."
+      - docker tag analytics-app:$IMAGE_TAG $ECR_REPO_URI:$IMAGE_TAG
   post_build:
     commands:
-      - echo Pushing image...
-      - docker push $ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/analytics-app:latest
+      - echo "Pushing the image to ECR..."
+      - docker push $ECR_REPO_URI:$IMAGE_TAG
+      - echo "Build completed successfully."

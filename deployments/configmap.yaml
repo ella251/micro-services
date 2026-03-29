@@ -4,4 +4,4 @@ metadata:
   name: analytics-config
 data:
   APP_ENV: "production"
-  FLASK_ENV: "production"
+  LOG_LEVEL: "info"
